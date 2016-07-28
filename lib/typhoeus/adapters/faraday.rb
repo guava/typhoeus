@@ -83,6 +83,7 @@ module Faraday # :nodoc:
         configure_proxy   req, env
         configure_timeout req, env
         configure_socket  req, env
+        configure_compression req, env
 
         req.on_complete do |resp|
           if resp.timed_out?
@@ -150,6 +151,12 @@ module Faraday # :nodoc:
       def configure_socket(req, env)
         if bind = env[:request][:bind]
           req.options[:interface] = bind[:host]
+        end
+      end
+
+      def configure_compression(req, env)
+        if (request_headers = env[:request_headers]) && (accept_encoding = request_headers['accept-encoding'])
+          req.options[:accept_encoding] = accept_encoding
         end
       end
 

@@ -304,6 +304,34 @@ describe Faraday::Adapter::Typhoeus do
     end
   end
 
+  describe "#configure_compression" do
+    before { adapter.method(:configure_compression).call(request, env) }
+
+    context "when Accept-Encoding header is set" do
+      let(:env) { { :request_headers => { 'accept-encoding' => 'gzip, deflate' } } }
+
+      it "sets the accept_encoding on options" do
+        expect(request.options[:accept_encoding]).to eq('gzip, deflate')
+      end
+    end
+
+    context "when Accept-Encoding header is not set" do
+      let(:env) { { :request_headers => { } } }
+
+      it "does not set accept_encoding on options" do
+        expect(request.options).not_to have_key :accept_encoding
+      end
+    end
+
+    context "when the request has no headers" do
+      let(:env) { { :request_headers => nil } }
+
+      it "does not set accept_encoding on options" do
+        expect(request.options).not_to have_key :accept_encoding
+      end
+    end
+  end
+
   describe "#parallel?" do
     context "when parallel_manager" do
       let(:env) { { :parallel_manager => true } }
